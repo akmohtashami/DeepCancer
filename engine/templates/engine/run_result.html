@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load humanize %}
+
+{% block content %}
+    {% if run.status == run.status.PENDING or run.status == run.status.RUNNING %}
+        <div class="ui icon info message">
+            <i class="notched circle loading icon"></i>
+            <div class="content">
+                <div class="header">
+                    {% trans 'Your run is in the queue and will be executed shortly.' %}
+                </div>
+            </div>
+        </div>
+    {% elif run.status == run.status.FINISHED %}
+        <h2 class="ui header">{% trans 'Files' %}</h2>
+        <div class="ui link list">
+                {% for output in downloadable_outputs %}
+            <a class="item" href="{% url "engine:run_result_file" run.uid output.name %}">
+                <i class="icon download"></i>
+                <div class="content">
+                    <div class="header">
+                        {{ output.name }}
+                    </div>
+                    <div class="description">
+                        {% trans 'Size' %}: {{ output.get_file_size | intcomma }} {% trans 'bytes' %}
+                    </div>
+                </div>
+            </a>
+                {% endfor %}
+        </div>
+        <div class="ui divider"></div>
+{{ included_data|safe }}
+    {% else %}
+        <div class="ui icon error message">
+            <i class="times icon"></i>
+            <div class="content">
+                <div class="header">
+                    {% trans 'We were unable to process your request. Please try again later.' %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
